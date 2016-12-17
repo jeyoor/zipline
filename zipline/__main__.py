@@ -372,6 +372,19 @@ def bundles():
         for timestamp in ingestions or ["<no ingestions>"]:
             click.echo("%s %s" % (bundle, timestamp))
 
+@main.command()
+@click.option(
+    '-to',
+    '--test-option',
+    type=click.Choice({'testa', 'testb'}),
+    default='testa',
+    show_default=True,
+    help='The test command line parameter.',
+)
+def testcli(test_option):
+    """Test that we can edit files and things work coolio
+    """
+    click.echo("This is a test cli command, option is:" + test_option)
 
 if __name__ == '__main__':
     main()
