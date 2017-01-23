@@ -29,6 +29,8 @@ from . risk import (
 
 from empyrical import (
     alpha_beta_aligned,
+    beta_fragility_heuristic_aligned,
+    #TODO: add gpd es and var here
     annual_volatility,
     cum_returns,
     downside_risk,
@@ -36,7 +38,6 @@ from empyrical import (
     max_drawdown,
     sharpe_ratio,
     sortino_ratio,
-    integer_true
 )
 
 log = logbook.Logger('Risk Cumulative')
@@ -56,12 +57,13 @@ class RiskMetricsCumulative(object):
     METRIC_NAMES = (
         'alpha',
         'beta',
+        'beta_fragility_heuristic',
+        #TODO: add GPD VaR and ES here
         'sharpe',
         'algorithm_volatility',
         'benchmark_volatility',
         'downside_risk',
         'sortino',
-        'integer_true',
         'information',
     )
 
@@ -131,7 +133,8 @@ class RiskMetricsCumulative(object):
         self.sharpe = empty_cont.copy()
         self.downside_risk = empty_cont.copy()
         self.sortino = empty_cont.copy()
-        self.integer_true = empty_cont.copy()
+        self.beta_fragility_heuristic = empty_cont.copy()
+        #TODO: add GPD VaR and ES here
         self.information = empty_cont.copy()
 
         self.drawdowns = empty_cont.copy()
@@ -273,9 +276,11 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
             self.algorithm_returns,
             _downside_risk=self.downside_risk[dt_loc]
         )
-        self.integer_true[dt_loc] = integer_true(
-            self.algorithm_returns
+        self.beta_fragility_heuristic[dt_loc] = beta_fragility_heuristic_aligned(
+            self.algorithm_returns,
+            self.benchmark_returns,
         )
+        #TODO: add GPD VaR and ES here
         self.information[dt_loc] = information_ratio(
             self.algorithm_returns,
             self.benchmark_returns,
@@ -314,7 +319,8 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
             'alpha': self.alpha[dt_loc],
             'sharpe': self.sharpe[dt_loc],
             'sortino': self.sortino[dt_loc],
-            'integer_true': self.integer_true[dt_loc],
+            'beta_fragility_heuristic': self.beta_fragility_heuristic[dt_loc],
+            #TODO: add GPD Var and ES here
             'information': self.information[dt_loc],
             'excess_return': self.excess_returns[dt_loc],
             'max_drawdown': self.max_drawdown,
