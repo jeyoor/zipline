@@ -36,6 +36,7 @@ from empyrical import (
     max_drawdown,
     sharpe_ratio,
     sortino_ratio,
+    integer_true
 )
 
 log = logbook.Logger('Risk Cumulative')
@@ -60,6 +61,7 @@ class RiskMetricsCumulative(object):
         'benchmark_volatility',
         'downside_risk',
         'sortino',
+        'integer_true',
         'information',
     )
 
@@ -129,6 +131,7 @@ class RiskMetricsCumulative(object):
         self.sharpe = empty_cont.copy()
         self.downside_risk = empty_cont.copy()
         self.sortino = empty_cont.copy()
+        self.integer_true = empty_cont.copy()
         self.information = empty_cont.copy()
 
         self.drawdowns = empty_cont.copy()
@@ -270,6 +273,9 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
             self.algorithm_returns,
             _downside_risk=self.downside_risk[dt_loc]
         )
+        self.integer_true[dt_loc] = integer_true(
+            self.algorithm_returns
+        )
         self.information[dt_loc] = information_ratio(
             self.algorithm_returns,
             self.benchmark_returns,
@@ -308,6 +314,7 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
             'alpha': self.alpha[dt_loc],
             'sharpe': self.sharpe[dt_loc],
             'sortino': self.sortino[dt_loc],
+            'integer_true': self.integer_true[dt_loc],
             'information': self.information[dt_loc],
             'excess_return': self.excess_returns[dt_loc],
             'max_drawdown': self.max_drawdown,
