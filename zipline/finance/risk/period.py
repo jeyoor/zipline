@@ -34,7 +34,6 @@ from empyrical import (
     max_drawdown,
     sharpe_ratio,
     sortino_ratio,
-    integer_true
 )
 
 log = logbook.Logger('Risk Period')
@@ -140,9 +139,6 @@ class RiskMetricsPeriod(object):
             self.algorithm_returns.values,
             self.benchmark_returns.values,
         )
-        self.integer_true = integer_true(self.algorithm_returns.values)
-        #TODO: calculate beta fragility here using the full benchmark_returns array!!!
-        #TODO: calculate gpd loss estimate here
         self.excess_return = self.algorithm_period_returns - \
             self.treasury_period_return
         self.max_drawdown = max_drawdown(self.algorithm_returns.values)
@@ -166,7 +162,6 @@ class RiskMetricsPeriod(object):
             'information': self.information,
             'beta': self.beta,
             'alpha': self.alpha,
-            'integer_true': self.integer_true,
             'excess_return': self.excess_return,
             'max_drawdown': self.max_drawdown,
             'max_leverage': self.max_leverage,
@@ -190,7 +185,6 @@ class RiskMetricsPeriod(object):
             "information",
             "beta",
             "alpha",
-            "integer_true",
             "max_drawdown",
             "max_leverage",
             "algorithm_returns",
