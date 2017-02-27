@@ -30,7 +30,7 @@ from . risk import (
 from empyrical import (
     alpha_beta_aligned,
     beta_fragility_heuristic_aligned,
-    #TODO: add gpd es and var here
+    gpd_risk_estimates_aligned,
     annual_volatility,
     cum_returns,
     downside_risk,
@@ -58,7 +58,11 @@ class RiskMetricsCumulative(object):
         'alpha',
         'beta',
         'beta_fragility_heuristic',
-        #TODO: add GPD VaR and ES here
+        'gpd_threshold',
+        'gpd_scale_param',
+        'gpd_shape_param',
+        'gpd_var_estimate',
+        'gpd_es_estimate',
         'sharpe',
         'algorithm_volatility',
         'benchmark_volatility',
@@ -134,7 +138,11 @@ class RiskMetricsCumulative(object):
         self.downside_risk = empty_cont.copy()
         self.sortino = empty_cont.copy()
         self.beta_fragility_heuristic = empty_cont.copy()
-        #TODO: add GPD VaR and ES here
+        self.gpd_threshold = empty_cont.copy()
+        self.gpd_scale_param = empty_cont.copy()
+        self.gpd_shape_param = empty_cont.copy()
+        self.gpd_var_estimate = empty_cont.copy()
+        self.gpd_es_estimate = empty_cont.copy()
         self.information = empty_cont.copy()
 
         self.drawdowns = empty_cont.copy()
@@ -276,11 +284,18 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
             self.algorithm_returns,
             _downside_risk=self.downside_risk[dt_loc]
         )
-        self.beta_fragility_heuristic[dt_loc] = beta_fragility_heuristic_aligned(
-            self.algorithm_returns,
-            self.benchmark_returns,
-        )
-        #TODO: add GPD VaR and ES here
+        self.beta_fragility_heuristic[dt_loc] = \
+            beta_fragility_heuristic_aligned(
+                self.algorithm_returns,
+                self.benchmark_returns,
+            )
+        (threshold, scale, shape, var, es) = \
+            gpd_risk_estimates_aligned(self.algorithm_returns)
+        self.gpd_threshold[dt_loc] = threshold
+        self.gpd_scale_param[dt_loc] = scale
+        self.gpd_shape_param[dt_loc] = shape
+        self.gpd_var_estimate[dt_loc] = var
+        self.gpd_es_estimate[dt_loc] = es
         self.information[dt_loc] = information_ratio(
             self.algorithm_returns,
             self.benchmark_returns,
@@ -319,8 +334,13 @@ algorithm_returns ({algo_count}) in range {start} : {end} on {dt}"
             'alpha': self.alpha[dt_loc],
             'sharpe': self.sharpe[dt_loc],
             'sortino': self.sortino[dt_loc],
-            'beta_fragility_heuristic': self.beta_fragility_heuristic[dt_loc],
-            #TODO: add GPD Var and ES here
+            'beta_fragility_heuristic': \
+                self.beta_fragility_heuristic[dt_loc],
+            'gpd_threshold': self.gpd_threshold[dt_loc],
+            'gpd_scale_param': self.gpd_scale_param[dt_loc],
+            'gpd_shape_param': self.gpd_shape_param[dt_loc],
+            'gpd_var_estimate': self.gpd_var_estimate[dt_loc],
+            'gpd_es_estimate': self.gpd_es_estimate[dt_loc],
             'information': self.information[dt_loc],
             'excess_return': self.excess_returns[dt_loc],
             'max_drawdown': self.max_drawdown,
